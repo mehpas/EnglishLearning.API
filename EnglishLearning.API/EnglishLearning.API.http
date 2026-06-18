@@ -1,0 +1,28 @@
+@EnglishLearning.API_HostAddress = https://localhost:7074
+
+### Tum kullanicilari getir
+GET {{EnglishLearning.API_HostAddress}}/api/kullanicilar
+
+### Tek kullanici getir
+GET {{EnglishLearning.API_HostAddress}}/api/kullanicilar/1
+
+### Yeni kullanici olustur
+POST {{EnglishLearning.API_HostAddress}}/api/kullanicilar
+Content-Type: application/json
+
+{
+  "isim": "Test Kullanici",
+  "email": "test@example.com"
+}
+
+### Kullanici guncelle
+PUT {{EnglishLearning.API_HostAddress}}/api/kullanicilar/1
+Content-Type: application/json
+
+{
+  "isim": "Guncel Isim",
+  "email": "guncel@example.com"
+}
+
+### Kullanici sil
+DELETE {{EnglishLearning.API_HostAddress}}/api/kullanicilar/1
