@@ -1,10 +1,13 @@
 using EnglishLearning.Application;
 using EnglishLearning.Application.Common.Constants;
+using EnglishLearning.Application.Common.Localization;
 using EnglishLearning.Application.Common.Messages;
 using EnglishLearning.Application.Common.Models;
 using EnglishLearning.API.Middleware;
 using EnglishLearning.Infrastructure;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Localization;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +29,19 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
+var supportedCultures = new[]
+{
+    new CultureInfo("tr"),
+    new CultureInfo("en")
+};
+
+builder.Services.Configure<RequestLocalizationOptions>(options =>
+{
+    options.DefaultRequestCulture = new RequestCulture("tr");
+    options.SupportedCultures = supportedCultures;
+    options.SupportedUICultures = supportedCultures;
+});
+
 builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
@@ -34,7 +50,7 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
             .Where(x => x.Value?.Errors.Count > 0)
             .ToDictionary(
                 x => x.Key,
-                x => x.Value!.Errors.Select(e => e.ErrorMessage).ToArray());
+                x => x.Value!.Errors.Select(e => MessageLocalizer.TranslateKey(e.ErrorMessage)).ToArray());
 
         var response = new ApiErrorResponse
         {
@@ -49,6 +65,12 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 });
 
 var app = builder.Build();
+
+var localizationOptions = app.Services
+    .GetRequiredService<Microsoft.Extensions.Options.IOptions<RequestLocalizationOptions>>()
+    .Value;
+
+app.UseRequestLocalization(localizationOptions);
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 
